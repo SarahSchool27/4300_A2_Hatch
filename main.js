@@ -1,6 +1,6 @@
 import { default as gulls } from 'https://cbcdn.githack.com/charlieroberts/gulls/raw/branch/main/gulls.js'
-import { default as Video    } from '/gulls/video.js'
-import { default as Mouse    } from '/gulls/mouse.js'
+import { default as Video    } from './gulls/video.js'
+import { default as Mouse    } from './gulls/mouse.js'
 
 
   async function run() {
