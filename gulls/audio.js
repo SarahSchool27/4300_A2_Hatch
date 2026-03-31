@@ -109,4 +109,4 @@ const Audio = {
   }
 }
 
-export default Audio
+window.Audio = Audio

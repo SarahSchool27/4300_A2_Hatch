@@ -11,4 +11,4 @@ const Mouse = {
   }
 }
 
-export default Mouse
+window.Mouse = Mouse

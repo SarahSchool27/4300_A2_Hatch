@@ -38,4 +38,4 @@ const Video = {
   }
 }
 
-export default Video
+window.Video = Video
