@@ -13,7 +13,7 @@ import { default as Mouse    } from './gulls/mouse.js'
 
 
   // our fragment shader, header contains bindings
-  const fragmentShader = `
+  /*const fragmentShader = `
    @group(0) @binding(0) var<uniform> res : vec2f;
    @group(0) @binding(1) var<uniform> frame : f32;
    @group(0) @binding(2) var<uniform> slider : f32;
@@ -33,9 +33,9 @@ import { default as Mouse    } from './gulls/mouse.js'
       return vec4f( mouse.x, mouse.y, mouse.z, 1. );
     
     
-      }`
+      }`*/
   //const fragmentShader =  await gulls.import('./shaders/header.wgsl') + await gulls.import( './shaders/default.wgsl' )
-  /*const fragmentShader = 
+  const fragmentShader = 
     `
     @group(0) @binding(0) var<uniform> res : vec2f;
     @group(0) @binding(1) var<uniform> frame : f32;
@@ -106,7 +106,7 @@ import { default as Mouse    } from './gulls/mouse.js'
 
 
     }
-  `*/
+  `
 
   // our vertex + fragment shader together
   const shader = quadVertexShader + fragmentShader
