@@ -78,7 +78,10 @@ import { default as Mouse    } from './gulls/mouse.js'
       let combined_mask = max(top_mask, bottom_mask);
       //color = vec3(combined_mask);
       
-      color -= combined_mask * vec3(0.2,0.2,0.2);
+
+      let video = textureSampleBaseClampToEdge( videoBuffer, backSampler, p );
+      color -= combined_mask;
+      color = max( combined_mask * video.rgb * vec3(0.5), color);
 
       color -= 1 - vec3(rippleGrid(p, slider_rippleDens, 10));
       return vec4(color,1.0);
