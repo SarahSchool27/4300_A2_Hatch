@@ -61,14 +61,24 @@ import { default as Mouse    } from './gulls/mouse.js'
   		var line_p1 = p;
       line_p1.y -= .5;
       line_p1.y += 0.1*sin(1*line_p1.x + frame/100);
-	  	color += 1- pow(abs(.0025/line_p1.y ),3.);
+      var line_1 = pow(abs(.0025/line_p1.y ),3.);
+	  	color += 1 - line_1;
+      
 
       //line2
   		var line_p2 = p;
       line_p2.y -= .5;
-      var height_modifier =  1* cos(frame/200);
+      var height_modifier =  0.5* cos(frame/200);
       line_p2.y += height_modifier*sin(5*line_p2.x + frame/100) + (line_p1.y*2);
-	  	color -= vec3(pow(abs(.0025/line_p2.y ),3.));
+      var line_2 = pow(abs(.0025/line_p2.y ),3.);
+	  	color -= vec3(line_2);
+
+      var line_p3 =p;
+      line_p3.y -= .5;
+      line_p3.y +=  1.2*height_modifier*sin(5*line_p2.x + frame/100) + (line_p1.y*2);
+      var line_3 = pow(abs(.0025/line_p3.y ),3.);
+	  	color -= vec3(line_3);
+
       
       let mask_line1 = vec3(step(0., line_p1.y));
       let mask_line2 = vec3(step(0., line_p2.y));
@@ -76,14 +86,16 @@ import { default as Mouse    } from './gulls/mouse.js'
       let top_mask = min(1- mask_line1, mask_line2);
       let bottom_mask = min(mask_line1, 1- mask_line2);
       let combined_mask = max(top_mask, bottom_mask);
-      //color = vec3(combined_mask);
+      let node_mask = min(line_1 ,line_2);
       
-
-      let video = textureSampleBaseClampToEdge( videoBuffer, backSampler, p );
+      let video = textureSampleBaseClampToEdge( videoBuffer, backSampler, p);
+      
       color -= combined_mask;
-      color = max( combined_mask * video.rgb * vec3(0.5), color);
+      color = max( combined_mask * video.rgb * vec3(0.4), color);
 
       color -= 1 - vec3(rippleGrid(p, slider_rippleDens, 10));
+
+      color += vec3(node_mask);
       return vec4(color,1.0);
 
     } 
