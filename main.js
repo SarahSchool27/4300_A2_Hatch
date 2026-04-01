@@ -39,7 +39,7 @@ import { default as Mouse    } from './gulls/mouse.js'
     `
     @group(0) @binding(0) var<uniform> res : vec2f;
     @group(0) @binding(1) var<uniform> frame : f32;
-    @group(0) @binding(2) var<uniform> slider : f32;
+    @group(0) @binding(2) var<uniform> slider_rippleDens : f32;
     @group(0) @binding(3) var backSampler: sampler;
     @group(0) @binding(4) var backBuffer: texture_2d<f32>;
     @group(0) @binding(5) var<uniform> mouse : vec3f;
@@ -55,10 +55,32 @@ import { default as Mouse    } from './gulls/mouse.js'
     @fragment
     fn fs( @builtin(position) pos : vec4f ) -> @location(0) vec4f {
       var p = pos.xy/res;
-      
-
       var color = vec3f(0.);
-      color += vec3(rippleGrid(p, 10, 10));
+
+      //line
+  		var line_p1 = p;
+      line_p1.y -= .5;
+      line_p1.y += 0.1*sin(1*line_p1.x + frame/100);
+	  	color += 1- pow(abs(.0025/line_p1.y ),3.);
+
+      //line2
+  		var line_p2 = p;
+      line_p2.y -= .5;
+      var height_modifier =  1* cos(frame/200);
+      line_p2.y += height_modifier*sin(5*line_p2.x + frame/100) + (line_p1.y*2);
+	  	color -= vec3(pow(abs(.0025/line_p2.y ),3.));
+      
+      let mask_line1 = vec3(step(0., line_p1.y));
+      let mask_line2 = vec3(step(0., line_p2.y));
+
+      let top_mask = min(1- mask_line1, mask_line2);
+      let bottom_mask = min(mask_line1, 1- mask_line2);
+      let combined_mask = max(top_mask, bottom_mask);
+      //color = vec3(combined_mask);
+      
+      color -= combined_mask * vec3(0.2,0.2,0.2);
+
+      color -= 1 - vec3(rippleGrid(p, slider_rippleDens, 10));
       return vec4(color,1.0);
 
     } 
@@ -69,6 +91,7 @@ import { default as Mouse    } from './gulls/mouse.js'
       //grid code
       var mod_p = p;
       mod_p.y += sin(mod_p.x*ripple_dens)/ripple_height;
+      mod_p.x += frame/1000;
       var grid_pos = grid(mod_p, 20.0, 40.0); //multiplication for grid
       var color : vec3f = vec3f(0.0);
       color = abs(floor(grid_pos.y) % 2) * vec3(0.5,0.5,0.5); //has to be abs or flip results on the negative
@@ -83,7 +106,12 @@ import { default as Mouse    } from './gulls/mouse.js'
       let circles   = distance( grid_pos, vec2(.5) );
       let threshold = smoothstep( .25,.275, circles );
 
+      
+
       color += vec3f(threshold);
+
+      color = clamp(color, vec3(0.0), vec3(1.0));
+
       return color;
     
     }
