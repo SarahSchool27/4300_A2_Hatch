@@ -55,33 +55,38 @@ import { default as Mouse    } from './gulls/mouse.js'
     @fragment
     fn fs( @builtin(position) pos : vec4f ) -> @location(0) vec4f {
       var p = pos.xy/res;
+      
+
+      var color = vec3f(0.);
+      color += vec3(rippleGrid(p, 10, 10));
+      return vec4(color,1.0);
+
+    } 
+
+    fn rippleGrid(p : vec2f, ripple_dens : f32, ripple_height : f32) -> vec3f{
       let PI = 3.14159;
 
-       p.y += sin(p.x*10)/10;
-
-      var grid_pos = grid(p, 20.0, 40.0); //multiplication for grid
-
+      //grid code
+      var mod_p = p;
+      mod_p.y += sin(mod_p.x*ripple_dens)/ripple_height;
+      var grid_pos = grid(mod_p, 20.0, 40.0); //multiplication for grid
       var color : vec3f = vec3f(0.0);
       color = abs(floor(grid_pos.y) % 2) * vec3(0.5,0.5,0.5); //has to be abs or flip results on the negative
-      //p.x += frame/ 10 * floor(grid_pos.y) % 2;
+      //p.x += 0.1 * floor(grid_pos.y) % 2;
 
-      
       grid_pos = fract(grid_pos); //actually make grid
-      grid_pos += sin(PI*p.y);
+      
+      //mod_p = p.xy * 0.5 + 0.5*p.xy/res; //weird results
 
+
+      grid_pos += sin(PI*mod_p.y);
       let circles   = distance( grid_pos, vec2(.5) );
       let threshold = smoothstep( .25,.275, circles );
 
-      color += vec3(threshold);
-      return vec4(color,1.0);
-
-
-      //view grid
-      //var grid_mask = isGridCoord(p, 2., 1., 4.0, 2.0);
-      //return vec4(vec3(grid_mask),1.0);
-     //return vec4( grid_pos.x,grid_pos.y, 1. ,1.);
-    } 
-
+      color += vec3f(threshold);
+      return color;
+    
+    }
 
 
     fn grid(p : vec2f, rows : f32, cols : f32) -> vec2f{
