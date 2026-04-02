@@ -47,7 +47,7 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
 
     //user uniforms
     @group(0) @binding(5) var<uniform> slider_rippleDens : f32;
-    //@group(0) @binding(6) var<uniform> user_color : vec3f;
+    @group(0) @binding(6) var<uniform> user_color : vec3f;
 
     // NOTE THAT THERE IS A DIFFERENT GROUP NUMBER FOR THE
     // VIDEO TEXTURE BELOW. This lets gulls easily rebind
@@ -99,8 +99,8 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
       var st =p;
       st += noise(st*20)*sin(frame/1000);
 
-      let large_noise_mask = smoothstep( 0.01, 0.5, noise((p+frame/8000)*5));
-      let small_noise_mask = smoothstep(0.01,0.5,noise(st *10));
+      let large_noise_mask = smoothstep( 0.01, 0.5, noise(((p+line_p1)+frame/8000)*5));
+      let small_noise_mask = smoothstep(0.01,0.5,noise((st +line_p1)*10));
       let noise_mask =  vec3(clamp(3 * min(large_noise_mask, small_noise_mask),0,1));
 
       //get video
@@ -108,7 +108,7 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
       let video = textureSampleBaseClampToEdge( videoBuffer, backSampler, p);
       
       color -= video_mask;
-      color = max( video_mask * video.rgb * vec3(0.4), color);
+      color = max( video_mask * video.rgb * user_color, color);
 
       color -= 1 - vec3(rippleGrid(p, slider_rippleDens, 10));
 
@@ -212,7 +212,7 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
   //control scheme (USER Uniforms) ------------
   const PARAMS = {
   rippleDens: 10,
-  color: {r: 1, g: 0, b: 0.33},
+  tint_color: {r: 0.29, g: 0.39, b: 0.27},
   };
 
 
@@ -221,7 +221,7 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
   //tweakplane uniforms
   let u_tp_sl_rippleDens = sg.uniform(PARAMS.rippleDens)
 
-  let u_tp_v3_color = sg.uniform(PARAMS.slider_rippleDens)
+  let u_tp_v3_color = sg.uniform(Object.values(PARAMS.tint_color))
 
   //tweakplane bindings
   pane.addBinding(PARAMS, 'rippleDens',  {min:0, max:50})  
@@ -235,11 +235,10 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
     }*/
   });
   
-  pane.addBinding(PARAMS, 'color', {color: {type: 'float'}})
+  pane.addBinding(PARAMS, 'tint_color', {color: {type: 'float'}})
    .on('change', (ev) => {
-    //console.log([ev.value.r, ev.value.g, ev.value.b]);
-
-     u_tp_v3_color.value = [ev.value.r, ev.value.g, ev.value.b];
+     u_tp_v3_color.value = Object.values(PARAMS.tint_color);
+     //console.log(Object.values(PARAMS.tint_color));
   });
 
 
