@@ -264,7 +264,8 @@ import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.
         mirrored : 1.0,
         top_only : 2.0,
         bottom_only : 3.0,
-        overlap : 4.0
+        overlap : 4.0,
+        off: 5.0
     },
     })
     .on('change', (ev) => {
